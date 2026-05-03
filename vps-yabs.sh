@@ -14,6 +14,7 @@
 
 YABS_VERSION="2026-05-03"
 
+echo -e
 echo -e '-------------------- VPS-YABS 汉化版 --------------------'
 echo -e '项目地址：https://github.com/verkyer/xg-yabs'
 echo -e '版本日期：'$YABS_VERSION
