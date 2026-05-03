@@ -89,6 +89,7 @@ curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | 
 
 ## 示例输出
 
+
 ```text
 -------------------- VPS-YABS 汉化版 --------------------
 项目地址：https://github.com/verkyer/xg-yabs
