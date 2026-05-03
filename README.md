@@ -1,202 +1,127 @@
-# Yet-Another-Bench-Script
+# VPS YABS 汉化版
 
-Presenting an attempt to create _yet another_ Linux server *bench*marking _script_...
+VPS YABS 汉化版是一个面向 Linux 服务器的性能基准测试脚本，用于快速查看 VPS 或独立服务器的磁盘、网络、CPU 和内存表现。
 
-![](https://user-images.githubusercontent.com/8313125/106475387-e1f6da00-6473-11eb-918c-c785ebeef8b9.jpg)
-Logo design by [Dian Pratama](https://github.com/dianp)
+脚本会自动运行常见测试工具：使用 [fio](https://github.com/axboe/fio) 测试磁盘性能，使用 [iperf3](https://github.com/esnet/iperf) 测试网络吞吐，使用 [Geekbench](https://www.geekbench.com/) 测试 CPU/内存与整体系统性能。脚本不要求提前安装测试依赖，也不需要管理员权限即可运行。
 
-This script automates the execution of the best benchmarking tools in the industry. Included are several tests to check the performance of critical areas of a server: disk performance with [fio](https://github.com/axboe/fio), network performance with [iperf3](https://github.com/esnet/iperf), and CPU/memory performance with [Geekbench](https://www.geekbench.com/). The script is designed to not require any external dependencies to be installed nor elevated privileges to run. If there are any features that you would like to see added, feel free to submit an issue describing your feature request or fork the project and submit a PR!
+## 如何运行
 
-### **What's New With YABS?**
-* [27 Feb 2023](https://github.com/masonr/yet-another-bench-script/commit/06eaa2ab3b32355bec8278c51c4be93b3662a96d) - Newly released [Geekbench 6](https://www.geekbench.com/) is added as the default Geekbench test.
-* [26 Feb 2023](https://github.com/masonr/yet-another-bench-script/commit/f075baf59c3057983fff0a30ea0c746b5ea88d91) - Network information added to YABS output using [ip-api](https://ip-api.com/).
-* [15 Aug 2022](https://github.com/masonr/yet-another-bench-script/commit/ae24e70fbf7a4848e81a70cf829ec44e060e63d5) - Added JSON output/upload support to export or auto-upload of YABS results for sharing.
-
-## How to Run
-
-```
-curl -sL https://yabs.sh | bash
+```sh
+curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash
 ```
 
-or 
+或：
 
-```
-wget -qO- yabs.sh | bash
-```
-
-**Local fio/iperf3 Packages**: If the tested system has fio and/or iperf3 already installed, the local package will take precedence over the precompiled binary.
-
-**Experimental ARM Compatibility**: Initial ARM compatibility has been introduced, however, is not considered entirely stable due to limited testing on distinct ARM devices. Report any errors or issues.
-
-**High Bandwidth Usage Notice**: By default, this script will perform many iperf network tests, which will try to max out the network port for ~20s per location (10s in each direction). Low-bandwidth servers (such as a NAT VPS) should consider running this script with the `-r` flag (for reduced iperf locations) or the `-i` flag (to disable network tests entirely).
-
-**Windows Users**: This script can be run on Windows systems by using [Windows Subsystem for Linux v2 (WSL 2)](https://learn.microsoft.com/en-us/windows/wsl/about). WSLv1 will not run the script and binaries correctly.
-
-### Flags (Skipping Tests, Reducing iperf Locations, Geekbench 4/5/6, etc.)
-
-```
-curl -sL https://yabs.sh | bash -s -- -flags
+```sh
+wget -qO- https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash
 ```
 
-| Flag | Description |
-| ---- | ----------- |
-| -b | Forces use of pre-compiled binaries from repo over local packages |
-| -f/-d | Disables the fio (disk performance) test |
-| -i | Disables the iperf (network performance) test |
-| -g | Disables the Geekbench (system performance) test |
-| -n | Skips the network information lookup and print out |
-| -h | Prints the help message with usage, flags detected, and local package (fio/iperf) status |
-| -r | Reduces the number of iperf locations (Scaleway/Clouvider LON+NYC) to lessen bandwidth usage |
-| -4 | Runs a Geekbench 4 test and disables the Geekbench 6 test |
-| -5 | Runs a Geekbench 5 test and disables the Geekbench 6 test |
-| -9 | Runs both the Geekbench 4 and 5 tests instead of the Geekbench 6 test |
-| -6 | Re-enables the Geekbench 6 test if any of the following were used: -4, -5, or -9 (-6 flag must be last to not be overridden) |
-| -j | Prints a JSON representation of the results to the screen |
-| -w \<filename\> | Writes the JSON results to a file using the file name provided |
-| -s \<url\> | Sends a JSON representation of the results to the designated URL(s) (see section below) |
+**本地 fio/iperf3 软件包**：如果被测试系统已经安装了 fio 和/或 iperf3，默认会优先使用本地软件包，而不是仓库中的预编译二进制文件。
 
-Options can be grouped together to skip multiple tests, i.e. `-fg` to skip the disk and system performance tests (effectively only testing network performance).
+**ARM 兼容性说明**：脚本已加入初步 ARM 兼容支持，但由于不同 ARM 设备测试覆盖有限，仍视为实验性功能。如遇到问题，建议记录系统架构和报错信息后反馈。
 
-**Geekbench License Key**: A Geekbench license key can be utilized during the Geekbench test to unlock all features. Simply put the email and key for the license in a file called _geekbench.license_. `echo "email@domain.com ABCDE-12345-FGHIJ-57890" > geekbench.license`
+**高带宽使用提醒**：默认情况下，脚本会执行多个 iperf 网络测试，每个节点会尝试占满网络端口约 20 秒（上传和下载各约 10 秒）。低带宽服务器（例如 NAT VPS）建议使用 `-r` 参数减少 iperf 节点，或使用 `-i` 参数完全禁用网络测试。
 
-### Submitting JSON Results
+**Windows 用户**：可以通过 [Windows Subsystem for Linux v2 (WSL 2)](https://learn.microsoft.com/en-us/windows/wsl/about) 在 Windows 系统上运行脚本。WSL1 无法正确运行脚本和相关二进制文件。
 
-Results from running this script can be sent to your benchmark results website of choice in JSON format. Invoke the `-s` flag and pass the URL to where the results should be submitted to:
+## 参数说明
 
-```
-curl -sL https://yabs.sh | bash -s -- -s "https://example.com/yabs/post"
+```sh
+curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash -s -- -flags
 ```
 
-JSON results can be sent to multiple endpoints by entering each site joined by a comma (e.g. "https://example.com/yabs/post,http://example.com/yabs2/post").
+| 参数 | 说明 |
+| ---- | ---- |
+| `-b` | 强制使用仓库中的预编译二进制文件，而不是本地安装的软件包 |
+| `-f`/`-d` | 禁用 fio 磁盘性能测试 |
+| `-i` | 禁用 iperf 网络性能测试 |
+| `-g` | 禁用 Geekbench 系统性能测试 |
+| `-n` | 跳过网络信息查询和输出 |
+| `-h` | 显示帮助信息、已识别参数以及本地 fio/iperf 检测状态 |
+| `-r` | 减少 iperf 测试节点数量，以降低带宽消耗 |
+| `-4` | 运行 Geekbench 4，并禁用默认 Geekbench 6 |
+| `-5` | 运行 Geekbench 5，并禁用默认 Geekbench 6 |
+| `-9` | 运行 Geekbench 4 和 5，而不是默认 Geekbench 6 |
+| `-6` | 重新启用 Geekbench 6；如果同时使用 `-4`、`-5` 或 `-9`，`-6` 必须放在最后 |
+| `-j` | 测试结束后在屏幕输出 JSON 结果 |
+| `-w <filename>` | 将 JSON 结果写入指定文件 |
+| `-s <url>` | 将 JSON 结果发送到指定 URL |
+| `-p <servers>` | 指定自定义 iperf 服务器，格式为 `host:port_range:name:location:network_modes`，多个服务器使用逗号分隔 |
 
-Sites supporting submission of YABS JSON results:
+参数可以组合使用。例如 `-fg` 会跳过磁盘和系统性能测试，只执行网络相关测试。
 
-| Website | Example Command |
-| --- | --- |
-| [YABSdb](https://yabsdb.com/) | `curl -sL https://yabs.sh \| bash -s -- -s "https://yabsdb.com/add"` |
-| [VPSBenchmarks](https://www.vpsbenchmarks.com/yabs/get_started) | `curl -sL https://yabs.sh \| bash -s -- -s https://www.vpsbenchmarks.com/yabs/upload` |
+**Geekbench 授权密钥**：如需在 Geekbench 测试中使用授权密钥，可在执行目录下创建 `geekbench.license` 文件，内容为邮箱和密钥：
 
-Example JSON output: [example.json](bin/example.json).
-
-## Tests Conducted
-
-* **[fio](https://github.com/axboe/fio)** - the most comprehensive I/O testing software available, fio grants the ability to evaluate disk performance in a variety of methods with a variety of options. Four random read and write fio disk tests are conducted as part of this script with 4k, 64k, 512k, and 1m block sizes. The tests are designed to evaluate disk throughput in near-real world (using random) scenarios with a 50/50 split (50% reads and 50% writes per test).
-* **[iperf3](https://github.com/esnet/iperf)** - the industry standard for testing download and upload speeds to various locations. This script utilizes iperf3 with 8 parallel threads and tests both download and upload speeds. If an iperf server is busy after 5 tries, the speed test for that location/direction is skipped.
-* **[Geekbench](https://www.geekbench.com/)** - Geekbench is a benchmarking program that measures system performance, which is widely used in the tech community. The web URL is displayed to be able to see complete test and individual benchmark results and allow comparison to other geekbench'd systems. The claim URL to add the Geekbench result to your Geekbench profile is written to a file in the directory that this script is executed from. By default, Geekbench 6 is the only Geekbench test performed, however, Geekbench 4 and/or 5 can also be toggled on by passing the appropriate flag.
-
-### Security Notice
-
-This script relies on external binaries in order to complete the performance tests. The network (iperf3) and disk (fio) tests use binaries that are compiled by myself utilizing a [Holy Build Box](https://github.com/phusion/holy-build-box) compilation environment to ensure binary portability. The reasons for doing this include ensuring standardized (parsable) output, allowing support of both 32-bit and 64-bit architectures, bypassing the need for prerequisites to be compiled and/or installed, among other reasons. For the system test, a Geekbench tarball is downloaded, extracted, and the resulting binary is run. Use this script at your own risk as you would with any script publicly available on the net. Additional information regarding the binaries, including compilation notes and steps, can be found in the bin directory's [README page](bin/README.md).
-
-## Example Output
-
+```sh
+echo "email@domain.com ABCDE-12345-FGHIJ-57890" > geekbench.license
 ```
+
+## 提交 JSON 结果
+
+脚本运行结果可以用 JSON 格式发送到你选择的基准测试结果网站。使用 `-s` 参数并传入提交地址即可：
+
+```sh
+curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash -s -- -s "https://example.com/yabs/post"
+```
+
+多个提交端点可以使用逗号连接，例如：`https://example.com/yabs/post,http://example.com/yabs2/post`。
+
+支持提交 JSON 结果的网站：
+
+| 网站 | 示例命令 |
+| ---- | -------- |
+| [YABSdb](https://yabsdb.com/) | `curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh \| bash -s -- -s "https://yabsdb.com/add"` |
+| [VPSBenchmarks](https://www.vpsbenchmarks.com/yabs/get_started) | `curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh \| bash -s -- -s https://www.vpsbenchmarks.com/yabs/upload` |
+
+示例 JSON 输出见 [bin/example.json](bin/example.json)。
+
+## 测试项目
+
+* **[fio](https://github.com/axboe/fio)**：用于评估磁盘随机读写性能。脚本会使用 4k、64k、512k 和 1m 块大小执行四组随机读写测试，并采用 50/50 读写比例。
+* **[iperf3](https://github.com/esnet/iperf)**：用于测试不同地区的上传和下载速度。脚本使用 8 个并行线程测试双向网络速度。如果某个 iperf 服务器繁忙，脚本会在多次尝试后跳过该节点或方向。
+* **[Geekbench](https://www.geekbench.com/)**：用于评估 CPU、内存和整体系统性能。脚本会输出 Geekbench 网页结果链接，方便查看完整测试和单项分数。认领结果用的 URL 会写入执行目录下的 `geekbench_claim.url` 文件。
+
+## 安全提示
+
+脚本会下载或运行外部二进制文件来完成部分性能测试。网络测试和磁盘测试可能使用仓库中的预编译 fio/iperf3 二进制文件；系统性能测试会下载 Geekbench 官方 tarball，解压后运行其中的二进制文件。
+
+和运行任何来自互联网的脚本一样，请自行评估风险。二进制文件的版本、哈希和编译说明可参考 [bin/README.md](bin/README.md)。
+
+## 示例输出
+
+```text
 # ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
 #              Yet-Another-Bench-Script              #
-#                     v2023-04-23                    #
-# https://github.com/masonr/yet-another-bench-script #
+#                     v2026-04-29                    #
+#          https://github.com/verkyer/xg-yabs        #
 # ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
 
-Sun 23 Apr 2023 01:41:14 PM EDT
-
-Basic System Information:
+基础系统信息：
 ---------------------------------
-Uptime     : 342 days, 18 hours, 35 minutes
-Processor  : Intel(R) Xeon(R) E-2276G CPU @ 3.80GHz
-CPU cores  : 12 @ 4693.667 MHz
+运行时间   : 12 days, 3 hours, 20 minutes
+处理器     : Intel(R) Xeon(R) CPU
+CPU 核心   : 4 @ 2499.998 MHz
 AES-NI     : ✔ Enabled
 VM-x/AMD-V : ✔ Enabled
-RAM        : 15.5 GiB
-Swap       : 14.9 GiB
-Disk       : 864.5 GiB
-Distro     : Ubuntu 20.04.6 LTS
-Kernel     : 5.4.0-110-generic
-VM Type    : NONE
-IPv4/IPv6  : ✔ Online / ✔ Online
+内存       : 7.8 GiB
+Swap       : 0.0 KiB
+磁盘       : 98.0 GiB
+发行版     : Ubuntu 22.04.4 LTS
+内核       : 5.15.0-generic
+虚拟化类型 : KVM
+IPv4/IPv6  : ✔ 在线 / ✔ 在线
 
-IPv6 Network Information:
+fio 磁盘速度测试（混合读写 50/50）（分区 /dev/vda1）：
 ---------------------------------
-ISP        : Clouvider Limited
-ASN        : AS62240 Clouvider
-Host       : USA Network
-Location   : New York, New York (NY)
-Country    : United States
-
-fio Disk Speed Tests (Mixed R/W 50/50):
----------------------------------
-Block Size | 4k            (IOPS) | 64k           (IOPS)
+块大小     | 4k            (IOPS) | 64k           (IOPS)
   ------   | ---            ----  | ----           ----
-Read       | 405.41 MB/s (101.3k) | 407.96 MB/s   (6.3k)
-Write      | 406.48 MB/s (101.6k) | 410.11 MB/s   (6.4k)
-Total      | 811.90 MB/s (202.9k) | 818.08 MB/s  (12.7k)
-           |                      |
-Block Size | 512k          (IOPS) | 1m            (IOPS)
-  ------   | ---            ----  | ----           ----
-Read       | 380.21 MB/s    (742) | 394.55 MB/s    (385)
-Write      | 400.41 MB/s    (782) | 420.82 MB/s    (410)
-Total      | 780.62 MB/s   (1.5k) | 815.37 MB/s    (795)
+读取       | 405.41 MB/s (101.3k) | 407.96 MB/s   (6.3k)
+写入       | 406.48 MB/s (101.6k) | 410.11 MB/s   (6.4k)
+合计       | 811.90 MB/s (202.9k) | 818.08 MB/s  (12.7k)
 
-iperf3 Network Speed Tests (IPv4):
----------------------------------
-Provider        | Location (Link)           | Send Speed      | Recv Speed      | Ping
------           | -----                     | ----            | ----            | ----
-Clouvider       | London, UK (10G)          | 1.61 Gbits/sec  | 2.39 Gbits/sec  | 77.5 ms
-Scaleway        | Paris, FR (10G)           | busy            | 2.25 Gbits/sec  | 83.3 ms
-Clouvider       | NYC, NY, US (10G)         | 9.10 Gbits/sec  | 8.85 Gbits/sec  | 1.21 ms
-
-iperf3 Network Speed Tests (IPv6):
----------------------------------
-Provider        | Location (Link)           | Send Speed      | Recv Speed      | Ping
------           | -----                     | ----            | ----            | ----
-Clouvider       | London, UK (10G)          | 2.00 Gbits/sec  | 21.1 Mbits/sec  | 76.7 ms
-Scaleway        | Paris, FR (10G)           | 2.66 Gbits/sec  | 1.56 Gbits/sec  | 75.9 ms
-Clouvider       | NYC, NY, US (10G)         | 3.42 Gbits/sec  | 7.80 Gbits/sec  | 1.15 ms
-
-Geekbench 4 Benchmark Test:
----------------------------------
-Test            | Value
-                |
-Single Core     | 5949
-Multi Core      | 23425
-Full Test       | https://browser.geekbench.com/v4/cpu/16746501
-
-Geekbench 5 Benchmark Test:
----------------------------------
-Test            | Value
-                |
-Single Core     | 1317
-Multi Core      | 5529
-Full Test       | https://browser.geekbench.com/v5/cpu/21102444
-
-Geekbench 6 Benchmark Test:
----------------------------------
-Test            | Value
-                |
-Single Core     | 1549
-Multi Core      | 5278
-Full Test       | https://browser.geekbench.com/v6/cpu/1021916
-
-YABS completed in 12 min 49 sec
-
+YABS 已完成，耗时 12 分 49 秒
 ```
 
-## Acknowledgements
+## 许可证
 
-This script was inspired by several great benchmarking scripts out there, including, but not limited to, [bench.sh](https://bench.sh/), [nench.sh](https://github.com/n-st/nench), [ServerBench](https://github.com/K4Y5/ServerBench), among others. Members of the [HostBalls](https://hostballs.com), [LowEndSpirit](https://lowendspirit.com), and [LowEndTalk](https://lowendtalk.com) hosting-related communities play a pivotal role in testing, evaluating, and shaping this script as it matures.
-
-## License
-```
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                    Version 2, December 2004
-
- Copyright (C) 2019 Mason Rowe <mason@rowe.sh>
-
- Everyone is permitted to copy and distribute verbatim or modified
- copies of this license document, and changing it is allowed as long
- as the name is changed.
-
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-  0. You just DO WHAT THE FUCK YOU WANT TO.
-```
+完整许可证文本请查看 [LICENSE](LICENSE)。

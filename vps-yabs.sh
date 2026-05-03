@@ -15,7 +15,7 @@
 YABS_VERSION="v2026-04-29"
 
 echo -e '# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #'
-echo -e '#              Yet-Another-Bench-Script              #'
+echo -e '#                  VPS YABS 汉化版                   #'
 echo -e '#                     '$YABS_VERSION'                    #'
 echo -e '#          https://github.com/verkyer/xg-yabs         #'
 echo -e '# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #'
@@ -130,6 +130,12 @@ if [ -n "$PRINT_HELP" ]; then
 	echo -e "       curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash -s -- -flags"
 	echo -e "       wget -qO- https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash"
 	echo -e "       wget -qO- https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash -s -- -flags"
+	echo -e
+	echo -e "国内加速 GitHub 链接："
+	echo -e "       curl -sL https://ghfast.top/https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash"
+	echo -e "       curl -sL https://ghfast.top/https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash -s -- -flags"
+	echo -e "       wget -qO- https://ghfast.top/https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash"
+	echo -e "       wget -qO- https://ghfast.top/https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | bash -s -- -flags"
 	echo -e
 	echo -e "参数："
 	echo -e "       -b : 优先使用仓库中的预编译二进制文件，而不是本地安装的软件包"
@@ -1027,11 +1033,11 @@ function launch_geekbench {
 			echo -en "\r\033[0K"
 			echo -e "Geekbench $VERSION 基准测试："
 			echo -e "---------------------------------"
-			printf "%-15s | %-30s\n" "项目" "数值"
-			printf "%-15s | %-30s\n" "" ""
-			printf "%-15s | %-30s\n" "单核" "$GEEKBENCH_SCORES_SINGLE"
-			printf "%-15s | %-30s\n" "多核" "$GEEKBENCH_SCORES_MULTI"
-			printf "%-15s | %-30s\n" "完整结果" "$GEEKBENCH_URL"
+			echo -e "项目       | 数值"
+			echo -e "           |"
+			echo -e "单核       | $GEEKBENCH_SCORES_SINGLE"
+			echo -e "多核       | $GEEKBENCH_SCORES_MULTI"
+			echo -e "完整结果   | $GEEKBENCH_URL"
 
 			if [[ -n $JSON ]]; then
 				JSON_RESULT+='{"version":'$VERSION',"single":'$GEEKBENCH_SCORES_SINGLE',"multi":'$GEEKBENCH_SCORES_MULTI
