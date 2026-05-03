@@ -12,13 +12,12 @@
 #             performance via fio. The script is designed to not require any dependencies
 #             - either compiled or installed - nor admin privileges to run.
 
-YABS_VERSION="v2026-04-29"
+YABS_VERSION="2026-05-03"
 
-echo -e '# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #'
-echo -e '#                  VPS YABS 汉化版                   #'
-echo -e '#                     '$YABS_VERSION'                    #'
-echo -e '#          https://github.com/verkyer/xg-yabs         #'
-echo -e '# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #'
+echo -e '-------------------- VPS-YABS 汉化版 --------------------'
+echo -e '项目地址：https://github.com/verkyer/xg-yabs'
+echo -e '版本日期：'$YABS_VERSION
+echo -e '---------------------------------------------------------'
 
 echo -e
 date
@@ -810,6 +809,42 @@ function iperf_test {
 	LATENCY_RESULT="${LATENCY_RUN}"
 }
 
+function display_width {
+	local TEXT="$1"
+	local BYTES ASCII_BYTES NON_ASCII_BYTES
+
+	BYTES=$(printf "%s" "$TEXT" | LC_ALL=C wc -c | tr -d '[:space:]')
+	ASCII_BYTES=$(printf "%s" "$TEXT" | LC_ALL=C tr -cd '\000-\177' | wc -c | tr -d '[:space:]')
+	NON_ASCII_BYTES=$(( BYTES - ASCII_BYTES ))
+
+	echo $(( ASCII_BYTES + NON_ASCII_BYTES * 2 / 3 ))
+}
+
+function print_table_cell {
+	local TEXT="$1"
+	local WIDTH="$2"
+	local TEXT_WIDTH PADDING
+
+	TEXT_WIDTH=$(display_width "$TEXT")
+	PADDING=$(( WIDTH - TEXT_WIDTH ))
+	[[ $PADDING -lt 0 ]] && PADDING=0
+
+	printf "%s%*s" "$TEXT" "$PADDING" ""
+}
+
+function print_iperf_row {
+	print_table_cell "$1" 15
+	printf " | "
+	print_table_cell "$2" 25
+	printf " | "
+	print_table_cell "$3" 15
+	printf " | "
+	print_table_cell "$4" 15
+	printf " | "
+	print_table_cell "$5" 15
+	printf "\n"
+}
+
 # launch_iperf
 # Purpose: This method is designed to facilitate the execution of iperf network speed tests to
 #          each public iperf server in the iperf server locations array.
@@ -823,8 +858,8 @@ function launch_iperf {
 	echo -e
 	echo -e "iperf3 网络速度测试（$MODE）："
 	echo -e "---------------------------------"
-	printf "%-15s | %-25s | %-15s | %-15s | %-15s\n" "服务商" "位置（线路）" "发送速度" "接收速度" "Ping"
-	printf "%-15s | %-25s | %-15s | %-15s | %-15s\n" "-----" "-----" "----" "----" "----"
+	print_iperf_row "服务商" "位置（线路）" "发送速度" "接收速度" "Ping"
+	print_iperf_row "-----" "-----" "----" "----" "----"
 
 	# loop through iperf locations array to run iperf test using each public iperf server
 	for (( i = 0; i < IPERF_LOCS_NUM; i++ )); do
@@ -842,7 +877,7 @@ function launch_iperf {
 			[[ -z $IPERF_SENDRESULT_VAL || "$IPERF_SENDRESULT_VAL" == *"0.00"* ]] && IPERF_SENDRESULT_VAL="busy" && IPERF_SENDRESULT_UNIT=""
 			[[ -z $IPERF_RECVRESULT_VAL || "$IPERF_RECVRESULT_VAL" == *"0.00"* ]] && IPERF_RECVRESULT_VAL="busy" && IPERF_RECVRESULT_UNIT=""
 			# print the speed results for the iperf location currently being evaluated
-			printf "%-15s | %-25s | %-15s | %-15s | %-15s\n" "${IPERF_LOCS[i*5+2]}" "${IPERF_LOCS[i*5+3]}" "$IPERF_SENDRESULT_VAL $IPERF_SENDRESULT_UNIT" "$IPERF_RECVRESULT_VAL $IPERF_RECVRESULT_UNIT" "$LATENCY_VAL"
+			print_iperf_row "${IPERF_LOCS[i*5+2]}" "${IPERF_LOCS[i*5+3]}" "$IPERF_SENDRESULT_VAL $IPERF_SENDRESULT_UNIT" "$IPERF_RECVRESULT_VAL $IPERF_RECVRESULT_UNIT" "$LATENCY_VAL"
 			if [[ -n $JSON ]]; then
 				JSON_RESULT+='{"mode":"'$MODE'","provider":"'${IPERF_LOCS[i*5+2]}'","loc":"'${IPERF_LOCS[i*5+3]}
 				JSON_RESULT+='","send":"'$IPERF_SENDRESULT_VAL' '$IPERF_SENDRESULT_UNIT'","recv":"'$IPERF_RECVRESULT_VAL' '$IPERF_RECVRESULT_UNIT'","latency":"'$LATENCY_VAL'"},'

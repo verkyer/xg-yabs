@@ -90,11 +90,10 @@ curl -sL https://raw.githubusercontent.com/verkyer/xg-yabs/master/vps-yabs.sh | 
 ## 示例输出
 
 ```text
-# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
-#              Yet-Another-Bench-Script              #
-#                     v2026-04-29                    #
-#          https://github.com/verkyer/xg-yabs        #
-# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## #
+-------------------- VPS-YABS 汉化版 --------------------
+项目地址：https://github.com/verkyer/xg-yabs
+版本日期：2026-05-03
+---------------------------------------------------------
 
 基础系统信息：
 ---------------------------------
